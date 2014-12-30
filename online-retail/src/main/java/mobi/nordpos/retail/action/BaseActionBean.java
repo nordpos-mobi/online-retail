@@ -21,10 +21,10 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import mobi.nordpos.retail.dao.ormlite.ApplicationPersist;
+import mobi.nordpos.dao.model.Application;
+import mobi.nordpos.dao.ormlite.ApplicationPersist;
 import mobi.nordpos.retail.ext.MobileActionBeanContext;
 import mobi.nordpos.retail.ext.MyLocalePicker;
-import mobi.nordpos.retail.model.Application;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.controller.StripesFilter;
@@ -48,7 +48,6 @@ public abstract class BaseActionBean implements ActionBean {
     private Application application;
 
     Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-    ConnectionSource connection;
 
     @Override
     public MobileActionBeanContext getContext() {
@@ -110,7 +109,8 @@ public abstract class BaseActionBean implements ActionBean {
     @ValidationMethod
     public void validateApplicationAvalaible(ValidationErrors errors) {
         try {
-            application = readApplication(getDataBaseApplication());
+            ApplicationPersist applicationPersist = new ApplicationPersist(getDataBaseConnection());
+            application = applicationPersist.read(getDataBaseApplication());
             if (application == null) {
                 errors.add("application.id", new SimpleError(
                         getLocalizationKey("error.DatabaseNotSupportApplication"), getDataBaseApplication()));
@@ -121,27 +121,19 @@ public abstract class BaseActionBean implements ActionBean {
         }
     }
 
-    protected Application readApplication(String id) throws SQLException {
-        try {
-            connection = new JdbcConnectionSource(getDataBaseURL(), getDataBaseUser(), getDataBasePassword());
-            ApplicationPersist applicationDao = new ApplicationPersist(connection);
-            return applicationDao.queryForId(id);
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
-        }
+    protected ConnectionSource getDataBaseConnection() throws SQLException {
+        return new JdbcConnectionSource(getDataBaseURL(), getDataBaseUser(), getDataBasePassword());
     }
 
-    public String getDataBaseURL() {
+    private String getDataBaseURL() {
         return getContext().getServletContext().getInitParameter(DB_URL);
     }
 
-    public String getDataBaseUser() {
+    private String getDataBaseUser() {
         return getContext().getServletContext().getInitParameter(DB_USER);
     }
 
-    public String getDataBasePassword() {
+    private String getDataBasePassword() {
         return getContext().getServletContext().getInitParameter(DB_PASSWORD);
     }
 
