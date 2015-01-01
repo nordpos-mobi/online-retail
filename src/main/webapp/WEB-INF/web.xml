@@ -9,18 +9,20 @@
 
     <context-param>
         <param-name>db.URL</param-name>
-        <param-value>jdbc:mysql://localhost:3306/nordpos?useUnicode=yes&amp;characterEncoding=UTF-8</param-value>
+        <!--<param-value>jdbc:mysql://localhost:3306/nordpos?useUnicode=yes&amp;characterEncoding=UTF-8</param-value>-->
+        <param-value>jdbc:derby://localhost:1527/nordpos-db</param-value>
     </context-param>
     
     <context-param>
         <param-name>db.user</param-name>
-        <param-value>user</param-value>
+        <param-value>APP</param-value>
     </context-param>
         
     <context-param>
         <param-name>db.password</param-name>
-        <param-value>password</param-value>
+        <param-value>app</param-value>
     </context-param>
+
     <context-param>
         <param-name>db.application.id</param-name>
         <param-value>nordpos</param-value>
