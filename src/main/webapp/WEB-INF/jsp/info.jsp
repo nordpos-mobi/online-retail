@@ -22,7 +22,7 @@
     </stripes:layout-component>
 
     <stripes:layout-component name="content">
-        <div data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-collapsed="false">
+        <div data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-collapsed="true">
             <h4><fmt:message key="label.servlet.environments" /></h4>
             <div class="ui-grid-a ui-responsive">
                 <div class="ui-block-a">
@@ -78,12 +78,22 @@
             </div>
         </div>
 
-        <div data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-collapsed="true">
+        <div data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-collapsed="false">
             <h4><fmt:message key="label.application.parameters" /></h4>
             <div class="ui-grid-a ui-responsive">
                 <div class="ui-block-a">
                     <div class="ui-body ui-body-c">
-                        <fmt:message key="label.application.version" />
+                        <fmt:message key="label.web.application.version" />
+                    </div>
+                </div>
+                <div class="ui-block-b">
+                    <div class="ui-body ui-body-c">
+                        <c:out value="${actionBean.webApplicationVersion.toString()}" />
+                    </div>
+                </div>
+                <div class="ui-block-a">
+                    <div class="ui-body ui-body-c">
+                        <fmt:message key="label.database.application.version" />
                     </div>
                 </div>
                 <div class="ui-block-b">
