@@ -27,6 +27,7 @@
 package mobi.nordpos.retail.ext;
 
 import javax.servlet.http.HttpServletRequest;
+import mobi.nordpos.retail.action.CustomerAuthorizationActionBean;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.RedirectResolution;
@@ -63,6 +64,16 @@ public class SecurityInterceptor implements Interceptor {
         log.debug("Intercepting request: ", url);
 
         Resolution resolution = context.proceed();
+
+        // A null resolution here indicates a normal flow to the next stage
+        boolean authed = ((MobileActionBeanContext) context.getActionBeanContext()).getCustomer() != null;
+        if (!authed && resolution == null) {
+            ActionBean bean = context.getActionBean();
+            if (bean != null && !bean.getClass().isAnnotationPresent(Public.class)) {
+                log.warn("Thwarted attempted to access ", bean.getClass().getSimpleName());
+                return new RedirectResolution(CustomerAuthorizationActionBean.class).addParameter("targetUrl", url);
+            }
+        }
 
         log.debug("Allowing public access to ", context.getActionBean().getClass().getSimpleName());
         return resolution;

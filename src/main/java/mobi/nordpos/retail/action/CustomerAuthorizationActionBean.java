@@ -44,7 +44,7 @@ import net.sourceforge.stripes.validation.ValidationError;
 @Public
 public class CustomerAuthorizationActionBean extends CustomerBaseActionBean {
 
-    private static final String LOGIN = "/WEB-INF/jsp/user_login.jsp";
+    private static final String LOGIN = "/WEB-INF/jsp/customer_login.jsp";
 
     private String targetUrl;
 
@@ -96,7 +96,7 @@ public class CustomerAuthorizationActionBean extends CustomerBaseActionBean {
                 getContext().getValidationErrors().add("loginPassword", error);
                 return getContext().getSourcePageResolution();
             } else {
-//                getContext().setCustomer(loginCustomer);
+                getContext().setCustomer(loginCustomer);
                 getContext().getMessages().add(
                         new SimpleMessage(getLocalizationKey("message.Customer.loged"), loginCustomer.getName())
                 );

@@ -15,12 +15,21 @@
  */
 package mobi.nordpos.retail.ext;
 
+import mobi.nordpos.dao.model.Customer;
 import net.sourceforge.stripes.action.ActionBeanContext;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
 public class MobileActionBeanContext extends ActionBeanContext {
+
+    public Customer getCustomer() {
+        return (Customer) getRequest().getSession().getAttribute("customer");
+    }
+
+    public void setCustomer(Customer customer) {
+        getRequest().getSession().setAttribute("customer", customer);
+    }
 
     /**
      * Logs the user out by invalidating the session.

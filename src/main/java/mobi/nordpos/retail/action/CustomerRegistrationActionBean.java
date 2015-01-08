@@ -37,7 +37,7 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 @Public
 public class CustomerRegistrationActionBean extends CustomerBaseActionBean {
 
-    private static final String REG_FORM = "/WEB-INF/jsp/user_reg.jsp";
+    private static final String REG_FORM = "/WEB-INF/jsp/customer_reg.jsp";
 
     @Validate(on = {"accept"},
             required = true,

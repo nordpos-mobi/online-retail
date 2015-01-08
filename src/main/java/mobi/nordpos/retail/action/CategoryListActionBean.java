@@ -30,7 +30,6 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-@Public
 public class CategoryListActionBean extends CategoryBaseActionBean {
 
     private static final String CATEGORY_LIST = "/WEB-INF/jsp/category_list.jsp";

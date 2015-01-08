@@ -28,6 +28,14 @@
                 <div data-role="header" role="banner">
                     <div class="ui-btn-left" data-role="controlgroup" data-type="horizontal" data-mini="true">
                         <stripes:layout-component name="buttons_left"/>
+                        <c:if test="${not empty customer}">
+                            <sdynattr:link href="/CustomerView.action"
+                                           class="ui-btn ui-corner-all ui-btn-icon-left ui-icon-user">
+                                <span>
+                                    <c:out value="${customer.name}"/>
+                                </span>
+                            </sdynattr:link>
+                        </c:if>
                     </div>
                     <h2>
                         <stripes:layout-component name="title"/>
