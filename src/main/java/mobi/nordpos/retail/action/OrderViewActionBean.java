@@ -15,31 +15,19 @@
  */
 package mobi.nordpos.retail.action;
 
-import mobi.nordpos.dao.model.Product;
-import mobi.nordpos.dao.ormlite.ProductPersist;
-import mobi.nordpos.dao.ormlite.TaxPersist;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public abstract class ProductBaseActionBean extends BaseActionBean {
+public class OrderViewActionBean extends OrderBaseActionBean {
 
-    private Product product;
+    private static final String ORDER_VIEW = "/WEB-INF/jsp/order_view.jsp";
 
-    public final ProductPersist productPersist;
-    public final TaxPersist taxPersist;
-
-    public ProductBaseActionBean() {
-        productPersist = new ProductPersist();
-        taxPersist = new TaxPersist();
+    @DefaultHandler
+    public Resolution view() {
+        return new ForwardResolution(ORDER_VIEW);
     }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
 }

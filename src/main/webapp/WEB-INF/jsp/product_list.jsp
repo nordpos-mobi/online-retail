@@ -35,7 +35,7 @@
             data-inset="true">
             <c:forEach items="${actionBean.productList}" var="product">                
                 <li>
-                    <sdynattr:link href="/ProductView.action"
+                    <sdynattr:link href="/OrderProduct.action"
                                    data-transition="slide">
                         <stripes:param name="product.code" value="${product.code}"/>
                         <c:out value="${product.name}"/>

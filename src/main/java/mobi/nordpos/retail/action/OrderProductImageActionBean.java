@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2015 Nord Trading Network.
+ * Copyright (c) 2012-2014 Nord Trading Network.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -17,8 +17,8 @@ package mobi.nordpos.retail.action;
 
 import java.sql.SQLException;
 import javax.servlet.http.HttpServletResponse;
-import mobi.nordpos.retail.ext.Public;
 import mobi.nordpos.dao.model.Product;
+import mobi.nordpos.retail.ext.Public;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.ValidationErrors;
@@ -28,10 +28,10 @@ import net.sourceforge.stripes.validation.ValidationMethod;
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
 @Public
-public class ProductImageActionBean extends ProductBaseActionBean {
-
+public class OrderProductImageActionBean extends OrderBaseActionBean {
+    
     private int thumbnailSize = 256;
-
+    
     public StreamingResolution preview() {
         return new StreamingResolution("image/jpeg") {
             @Override
@@ -43,7 +43,7 @@ public class ProductImageActionBean extends ProductBaseActionBean {
             }
         }.setFilename("product-".concat(getProduct().getCode()).concat(".jpeg"));
     }
-
+    
     @ValidationMethod(on = "preview")
     public void validateProductIdIsAvalaible(ValidationErrors errors) {
         try {
@@ -57,13 +57,13 @@ public class ProductImageActionBean extends ProductBaseActionBean {
                     new SimpleError(ex.getMessage()));
         }
     }
-
+    
     public int getThumbnailSize() {
         return thumbnailSize;
     }
-
+    
     public void setThumbnailSize(int thumbnailSize) {
         this.thumbnailSize = thumbnailSize;
     }
-
+    
 }

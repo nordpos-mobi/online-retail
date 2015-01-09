@@ -42,12 +42,9 @@
                     </h2>
                     <div class="ui-btn-right" data-role="controlgroup" data-type="horizontal" data-mini="true">
                         <stripes:layout-component name="buttons_right"/>
-                        <c:if test="${not empty user}">
-                            <sdynattr:link href="/UserView.action"
-                                           class="ui-btn ui-corner-all ui-btn-icon-left ui-icon-user">
-                                <span>
-                                    <c:out value="${user.name}"/>
-                                </span>
+                        <c:if test="${not empty order}">
+                            <sdynattr:link href="/OrderView.action"
+                                           class="ui-btn ui-corner-all ui-btn-icon-left ui-icon-shop">
                             </sdynattr:link>
                         </c:if>
                         <fmt:message var="otherLocale" key="layout.otherLocale"/>

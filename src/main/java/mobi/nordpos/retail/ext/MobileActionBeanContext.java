@@ -16,6 +16,7 @@
 package mobi.nordpos.retail.ext;
 
 import mobi.nordpos.dao.model.Customer;
+import mobi.nordpos.dao.model.SharedTicket;
 import net.sourceforge.stripes.action.ActionBeanContext;
 
 /**
@@ -29,6 +30,14 @@ public class MobileActionBeanContext extends ActionBeanContext {
 
     public void setCustomer(Customer customer) {
         getRequest().getSession().setAttribute("customer", customer);
+    }
+
+    public SharedTicket getOrder() {
+        return (SharedTicket) getRequest().getSession().getAttribute("order");
+    }
+
+    public void setOrder(SharedTicket order) {
+        getRequest().getSession().setAttribute("order", order);
     }
 
     /**
