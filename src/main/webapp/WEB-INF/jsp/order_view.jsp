@@ -157,6 +157,15 @@
             </tfoot>
         </table>
 
+        <div class="ui-body">
+            <sdynattr:link href="/OrderPayment.action"
+                           event="view"
+                           class="ui-btn ui-shadow ui-corner-all"
+                           role="button">
+                <fmt:message key="label.OrderPayment" />
+            </sdynattr:link>  
+        </div>
+
     </stripes:layout-component>
 
     <stripes:layout-component name="footer">

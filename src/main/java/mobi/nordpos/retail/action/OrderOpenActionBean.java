@@ -97,14 +97,4 @@ public class OrderOpenActionBean extends OrderBaseActionBean {
         this.removeLineNumber = removeLineNumber;
     }
 
-//    @ValidationMethod
-//    public void validateSharedTicketIsAvalaible(ValidationErrors errors) {
-//        try {
-//            sharedTicketPersist.init(getDataBaseConnection());
-//            setTicket(sharedTicketPersist.read(getContext().getOrder().getId()).getContent());            
-//        } catch (SQLException ex) {
-//            getContext().getValidationErrors().addGlobalError(
-//                    new SimpleError(ex.getMessage()));
-//        }
-//    }
 }
