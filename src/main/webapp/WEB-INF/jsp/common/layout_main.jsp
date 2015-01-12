@@ -43,7 +43,8 @@
                     <div class="ui-btn-right" data-role="controlgroup" data-type="horizontal" data-mini="true">
                         <stripes:layout-component name="buttons_right"/>
                         <c:if test="${not empty order}">
-                            <sdynattr:link href="/OrderView.action"
+                            <sdynattr:link href="/OrderOpen.action"
+                                           event="view"
                                            class="ui-btn ui-corner-all ui-btn-icon-left ui-icon-shop">
                                 <span>
                                     <fmt:formatNumber value="${order.totalValue}"
