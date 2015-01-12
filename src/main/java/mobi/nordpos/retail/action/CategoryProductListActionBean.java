@@ -34,6 +34,7 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
+@Public
 public class CategoryProductListActionBean extends CategoryBaseActionBean {
 
     private static final String PRODUCT_LIST = "/WEB-INF/jsp/product_list.jsp";

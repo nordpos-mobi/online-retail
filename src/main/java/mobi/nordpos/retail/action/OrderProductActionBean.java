@@ -30,6 +30,7 @@ import mobi.nordpos.dao.ormlite.TaxPersist;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.SimpleMessage;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.Validate;
 import net.sourceforge.stripes.validation.ValidateNestedProperties;
@@ -39,7 +40,6 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-@Public
 public class OrderProductActionBean extends OrderBaseActionBean {
 
     private static final String PRODUCT_ORDER = "/WEB-INF/jsp/product_order.jsp";
@@ -129,6 +129,9 @@ public class OrderProductActionBean extends OrderBaseActionBean {
         }
         sharedTicket.setContent(ticket);
         getContext().setOrder(sharedTicket);
+         getContext().getMessages().add( new SimpleMessage(getLocalizationKey("message.OrderTicketLine.added"),
+                sharedTicket.getName(), getProduct().getName(), getOrderUnit()));
+        
     }
 
 }

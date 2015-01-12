@@ -45,6 +45,13 @@
                         <c:if test="${not empty order}">
                             <sdynattr:link href="/OrderView.action"
                                            class="ui-btn ui-corner-all ui-btn-icon-left ui-icon-shop">
+                                <span>
+                                    <fmt:formatNumber value="${order.totalValue}"
+                                                      type="CURRENCY"
+                                                      pattern="#0.00 ¤"                                                  
+                                                      maxFractionDigits="2" 
+                                                      minFractionDigits="2"/>
+                                </span>
                             </sdynattr:link>
                         </c:if>
                         <fmt:message var="otherLocale" key="layout.otherLocale"/>
@@ -56,11 +63,11 @@
                         </sdynattr:link>
                     </div>
                 </div>
-                <div data-role="content" style="padding: 15px" align="center">
+                <div data-role="content" style="padding: 0.6em" align="center">
                     <stripes:errors />
                     <stripes:messages />
                     <stripes:layout-component name="content"/>
-                    <div class="ui-body ui-body-d">
+                    <div class="ui-body ui-body-d" style="margin-top:0.6em">
                         <a href="${actionBean.application.projectURL}">
                             <img src="<c:url value='/image/poweredby-${actionBean.application.id}.png' />" alt="${actionBean.application.toString()}"/>
                         </a>
