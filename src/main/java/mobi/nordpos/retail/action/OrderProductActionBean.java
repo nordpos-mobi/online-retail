@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
-import mobi.nordpos.retail.ext.Public;
 import mobi.nordpos.dao.model.Product;
 import mobi.nordpos.dao.model.SharedTicket;
 import mobi.nordpos.dao.ormlite.TaxPersist;
@@ -96,8 +95,6 @@ public class OrderProductActionBean extends OrderBaseActionBean {
 
     @ValidationMethod(on = "add", priority = 1)
     public void tryOrderChange(ValidationErrors errors) {
-        TicketInfo ticket;
-        SharedTicket sharedTicket = getContext().getOrder();
         Product product = getProduct();
         ProductInfo productInfo = new ProductInfo();
         productInfo.setId(product.getId());
@@ -115,23 +112,38 @@ public class OrderProductActionBean extends OrderBaseActionBean {
         TicketLineInfo ticketLine = new TicketLineInfo(productInfo, product.getPriceSell().doubleValue(), taxInfo);
         ticketLine.setMultiply(orderUnit.doubleValue());
 
-        if (sharedTicket == null) {
-            ticket = new TicketInfo();
-            ticket.setTickettype(TicketInfo.RECEIPT_NORMAL);
-            ticket.setM_dDate(new Date());
-            ticket.addLine(ticketLine);
-            sharedTicket = new SharedTicket();
-            sharedTicket.setId(UUID.randomUUID().toString());
-            sharedTicket.setName(ticket.getName());
-        } else {
-            ticket = sharedTicket.getContent();
-            ticket.addLine(ticketLine);
+        try {
+            TicketInfo ticket;
+            SharedTicket sharedTicket = getContext().getOrder();
+            sharedTicketPersist.init(getDataBaseConnection());
+            if (sharedTicket == null) {
+                ticket = new TicketInfo();
+                ticket.setTickettype(TicketInfo.RECEIPT_NORMAL);
+                ticket.setM_dDate(new Date());
+                ticket.addLine(ticketLine);
+                sharedTicket = new SharedTicket();
+                sharedTicket.setId(UUID.randomUUID().toString());
+                sharedTicket.setName(ticket.getName());
+                sharedTicket.setContent(ticket);
+                getContext().getMessages().add(
+                        new SimpleMessage(getLocalizationKey("message.OrderTicketLine.added"),
+                                sharedTicketPersist.add(sharedTicket).getName(), getProduct().getName(), getOrderUnit())
+                );
+            } else {
+                ticket = sharedTicket.getContent();
+                ticket.addLine(ticketLine);
+                sharedTicket.setContent(ticket);
+                if (sharedTicketPersist.change(sharedTicket)) {
+                    getContext().getMessages().add(
+                            new SimpleMessage(getLocalizationKey("message.OrderTicketLine.added"),
+                                    sharedTicket.getName(), getProduct().getName(), getOrderUnit()));
+                }
+            }
+            getContext().setOrder(sharedTicket);
+        } catch (SQLException ex) {
+            getContext().getValidationErrors().addGlobalError(
+                    new SimpleError(ex.getMessage()));
         }
-        sharedTicket.setContent(ticket);
-        getContext().setOrder(sharedTicket);
-         getContext().getMessages().add( new SimpleMessage(getLocalizationKey("message.OrderTicketLine.added"),
-                sharedTicket.getName(), getProduct().getName(), getOrderUnit()));
-        
     }
 
 }

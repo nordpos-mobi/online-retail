@@ -15,9 +15,7 @@
  */
 package mobi.nordpos.retail.action;
 
-import mobi.nordpos.dao.model.Place;
 import mobi.nordpos.dao.model.Product;
-import mobi.nordpos.dao.ormlite.PlacePersist;
 import mobi.nordpos.dao.ormlite.ProductPersist;
 import mobi.nordpos.dao.ormlite.SharedTicketPersist;
 
