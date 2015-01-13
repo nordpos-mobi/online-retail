@@ -19,13 +19,18 @@ import java.math.BigDecimal;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.UUID;
 import mobi.nordpos.dao.model.ClosedCash;
 import mobi.nordpos.dao.model.Receipt;
+import mobi.nordpos.dao.model.Ticket;
+import mobi.nordpos.dao.model.Ticket.TicketType;
+import mobi.nordpos.dao.model.TicketNumber;
+import mobi.nordpos.dao.model.User;
 import mobi.nordpos.dao.ormlite.ClosedCashPersist;
+import mobi.nordpos.dao.ormlite.ReceiptPersist;
+import mobi.nordpos.dao.ormlite.TicketNumberPersist;
+import mobi.nordpos.dao.ormlite.UserPersist;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.SimpleMessage;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.Validate;
 import net.sourceforge.stripes.validation.ValidationErrors;
@@ -37,20 +42,55 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 public class OrderPaymentActionBean extends OrderBaseActionBean {
 
     private static final String PAYMENT_VIEW = "/WEB-INF/jsp/order_payment.jsp";
+    
+    private static final String DEFAULT_USER_ID = "3";
 
     @Validate(on = {"post"}, required = true, expression = "${(paymentType == 'cash' && paymentAmount >= total) || (paymentType == 'magcard' && paymentAmount == total) }")
     private BigDecimal paymentAmount;
     @Validate(on = {"post"}, required = true, expression = "${paymentType == 'cash' || paymentType == 'magcard'}")
     private String paymentType;
 
-    private UUID openCashId;
+    private ClosedCash openCash;
 
     public Resolution view() {
         return new ForwardResolution(PAYMENT_VIEW);
     }
 
     public Resolution post() {
+        ReceiptPersist receiptPersist = new ReceiptPersist();
+        UserPersist userPersist = new UserPersist();
+        TicketNumberPersist ticketNumberPersist = new TicketNumberPersist();
+
         try {
+            receiptPersist.init(getDataBaseConnection());
+            userPersist.init(getDataBaseConnection());
+            ticketNumberPersist.init(getDataBaseConnection());
+
+            Receipt receipt = new Receipt();
+            receipt.setClosedCash(openCash);
+            receipt.setDate(new Date());
+
+            receipt = receiptPersist.add(receipt);
+
+            Ticket ticket = new Ticket();
+            ticket.setId(receipt.getId());
+            ticket.setType(TicketType.SELL.getTicketType());
+
+            User user = userPersist.read(DEFAULT_USER_ID);
+            ticket.setUser(user);
+
+            TicketNumber number = ticketNumberPersist.readList().get(0);
+            if (getDataBaseConnection().getDatabaseType().getDatabaseName().equals("Derby Client/Server")) {
+                if (ticketNumberPersist.delete(number)) {
+                    number = ticketNumberPersist.add(new TicketNumber());
+                }
+            } else {
+                if (ticketNumberPersist.change(number)) {
+                    number = ticketNumberPersist.readList().get(0);
+                }
+            }
+            ticket.setNumber(number.getId());
+
             sharedTicketPersist.init(getDataBaseConnection());
             sharedTicketPersist.delete(getContext().getOrder().getId());
             getContext().setOrder(null);
@@ -88,13 +128,13 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
         ClosedCashPersist closedCashPersist = new ClosedCashPersist();
         try {
             closedCashPersist.init(getDataBaseConnection());
-            openCashId = closedCashPersist.readOpen(hostName).getId();
-            if (openCashId == null) {
-                ClosedCash closedCash = new ClosedCash();
-                closedCash.setHost(hostName);
-                closedCash.setHostSequence(1);
-                closedCash.setDateStart(new Date());
-                openCashId = closedCashPersist.add(closedCash).getId();
+            openCash = closedCashPersist.readOpen(hostName);
+            if (openCash == null) {
+                openCash = new ClosedCash();
+                openCash.setHost(hostName);
+                openCash.setHostSequence(1);
+                openCash.setDateStart(new Date());
+                openCash = closedCashPersist.add(openCash);
             }
         } catch (SQLException ex) {
             getContext().getValidationErrors().addGlobalError(
