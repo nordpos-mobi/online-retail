@@ -15,19 +15,29 @@
  */
 package mobi.nordpos.retail.action;
 
+import com.openbravo.pos.ticket.TicketInfo;
+import com.openbravo.pos.ticket.TicketLineInfo;
 import java.math.BigDecimal;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 import mobi.nordpos.dao.model.ClosedCash;
+import mobi.nordpos.dao.model.Customer;
+import mobi.nordpos.dao.model.Product;
 import mobi.nordpos.dao.model.Receipt;
+import mobi.nordpos.dao.model.Tax;
 import mobi.nordpos.dao.model.Ticket;
 import mobi.nordpos.dao.model.Ticket.TicketType;
+import mobi.nordpos.dao.model.TicketLine;
 import mobi.nordpos.dao.model.TicketNumber;
 import mobi.nordpos.dao.model.User;
 import mobi.nordpos.dao.ormlite.ClosedCashPersist;
+import mobi.nordpos.dao.ormlite.CustomerPersist;
 import mobi.nordpos.dao.ormlite.ReceiptPersist;
+import mobi.nordpos.dao.ormlite.TicketLinePersist;
 import mobi.nordpos.dao.ormlite.TicketNumberPersist;
+import mobi.nordpos.dao.ormlite.TicketPersist;
 import mobi.nordpos.dao.ormlite.UserPersist;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -42,7 +52,7 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 public class OrderPaymentActionBean extends OrderBaseActionBean {
 
     private static final String PAYMENT_VIEW = "/WEB-INF/jsp/order_payment.jsp";
-    
+
     private static final String DEFAULT_USER_ID = "3";
 
     @Validate(on = {"post"}, required = true, expression = "${(paymentType == 'cash' && paymentAmount >= total) || (paymentType == 'magcard' && paymentAmount == total) }")
@@ -57,41 +67,16 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
     }
 
     public Resolution post() {
-        ReceiptPersist receiptPersist = new ReceiptPersist();
-        UserPersist userPersist = new UserPersist();
-        TicketNumberPersist ticketNumberPersist = new TicketNumberPersist();
+        TicketLinePersist ticketLinePersist = new TicketLinePersist();
 
         try {
-            receiptPersist.init(getDataBaseConnection());
-            userPersist.init(getDataBaseConnection());
-            ticketNumberPersist.init(getDataBaseConnection());
-
-            Receipt receipt = new Receipt();
-            receipt.setClosedCash(openCash);
-            receipt.setDate(new Date());
-
-            receipt = receiptPersist.add(receipt);
-
-            Ticket ticket = new Ticket();
-            ticket.setId(receipt.getId());
-            ticket.setType(TicketType.SELL.getTicketType());
-
-            User user = userPersist.read(DEFAULT_USER_ID);
-            ticket.setUser(user);
-
-            TicketNumber number = ticketNumberPersist.readList().get(0);
-            if (getDataBaseConnection().getDatabaseType().getDatabaseName().equals("Derby Client/Server")) {
-                if (ticketNumberPersist.delete(number)) {
-                    number = ticketNumberPersist.add(new TicketNumber());
-                }
-            } else {
-                if (ticketNumberPersist.change(number)) {
-                    number = ticketNumberPersist.readList().get(0);
-                }
-            }
-            ticket.setNumber(number.getId());
-
             sharedTicketPersist.init(getDataBaseConnection());
+            ticketLinePersist.init(getDataBaseConnection());
+            Receipt receipt = getPostedReceipt();
+            Ticket ticket = getPostedTicket(receipt);
+            
+            ticketLinePersist.addTicketLineList(getContext().getOrder(), ticket);
+            
             sharedTicketPersist.delete(getContext().getOrder().getId());
             getContext().setOrder(null);
         } catch (SQLException ex) {
@@ -100,6 +85,57 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
             return getContext().getSourcePageResolution();
         }
         return new ForwardResolution(WelcomeActionBean.class);
+    }
+
+    private Receipt getPostedReceipt() throws SQLException {
+        ReceiptPersist receiptPersist = new ReceiptPersist();
+        receiptPersist.init(getDataBaseConnection());
+        Receipt receipt = new Receipt();
+        receipt.setClosedCash(openCash);
+        receipt.setDate(new Date());
+        return receiptPersist.add(receipt);
+    }
+
+    private Ticket getPostedTicket(Receipt receipt) throws SQLException {
+        TicketPersist ticketPersist = new TicketPersist();
+        ticketPersist.init(getDataBaseConnection());
+        Ticket ticket = new Ticket();
+        ticket.setId(receipt.getId());
+        ticket.setType(TicketType.SELL.getTicketType());
+        ticket.setCustomer(getContext().getCustomer());
+        ticket.setUser(getAssignUser(DEFAULT_USER_ID));
+
+        TicketNumber number = getCurrentTicketNumber();
+        if (number != null) {
+            ticket.setNumber(number.getId());
+        }
+
+        return ticketPersist.add(ticket);
+    }
+
+    private User getAssignUser(String id) throws SQLException {
+        UserPersist userPersist = new UserPersist();
+        userPersist.init(getDataBaseConnection());
+        return userPersist.find(User.ID, id);
+    }
+
+    private TicketNumber getCurrentTicketNumber() throws SQLException {
+        TicketNumberPersist ticketNumberPersist = new TicketNumberPersist();
+        ticketNumberPersist.init(getDataBaseConnection());
+        TicketNumber number = ticketNumberPersist.readList().get(0);
+        if (getDataBaseConnection().getDatabaseType().getDatabaseName().equals("Derby Client/Server")) {
+            if (ticketNumberPersist.delete(number)) {
+                return ticketNumberPersist.add(new TicketNumber());
+            } else {
+                return null;
+            }
+        } else {
+            if (ticketNumberPersist.change(number)) {
+                return ticketNumberPersist.readList().get(0);
+            } else {
+                return null;
+            }
+        }
     }
 
     public BigDecimal getPaymentAmount() {
