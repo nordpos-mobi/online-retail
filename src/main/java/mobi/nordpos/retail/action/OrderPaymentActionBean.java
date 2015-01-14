@@ -15,26 +15,23 @@
  */
 package mobi.nordpos.retail.action;
 
-import com.openbravo.pos.ticket.TicketInfo;
-import com.openbravo.pos.ticket.TicketLineInfo;
 import java.math.BigDecimal;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.List;
 import mobi.nordpos.dao.model.ClosedCash;
-import mobi.nordpos.dao.model.Customer;
-import mobi.nordpos.dao.model.Product;
+import mobi.nordpos.dao.model.Payment;
+import mobi.nordpos.dao.model.Payment.PaymentType;
 import mobi.nordpos.dao.model.Receipt;
-import mobi.nordpos.dao.model.Tax;
+import mobi.nordpos.dao.model.SharedTicket;
 import mobi.nordpos.dao.model.Ticket;
 import mobi.nordpos.dao.model.Ticket.TicketType;
-import mobi.nordpos.dao.model.TicketLine;
 import mobi.nordpos.dao.model.TicketNumber;
 import mobi.nordpos.dao.model.User;
 import mobi.nordpos.dao.ormlite.ClosedCashPersist;
-import mobi.nordpos.dao.ormlite.CustomerPersist;
+import mobi.nordpos.dao.ormlite.PaymentPersist;
 import mobi.nordpos.dao.ormlite.ReceiptPersist;
+import mobi.nordpos.dao.ormlite.TaxLinePersist;
 import mobi.nordpos.dao.ormlite.TicketLinePersist;
 import mobi.nordpos.dao.ormlite.TicketNumberPersist;
 import mobi.nordpos.dao.ormlite.TicketPersist;
@@ -68,16 +65,40 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
 
     public Resolution post() {
         TicketLinePersist ticketLinePersist = new TicketLinePersist();
+        TaxLinePersist taxLinePersist = new TaxLinePersist();
+        PaymentPersist paymentPersist = new PaymentPersist();
+        SharedTicket order = getContext().getOrder();
 
         try {
             sharedTicketPersist.init(getDataBaseConnection());
             ticketLinePersist.init(getDataBaseConnection());
+            taxLinePersist.init(getDataBaseConnection());
+            paymentPersist.init(getDataBaseConnection());
+
             Receipt receipt = getPostedReceipt();
+            taxLinePersist.addTaxLineList(order, receipt);
+
+            Payment payment = new Payment();
+            payment.setReceipt(receipt);
+            payment.setType(paymentType);
+            payment.setAmount(paymentAmount);
+            paymentPersist.add(payment);
+
+            if (paymentType.equals(PaymentType.valueOf("CASH").getPaymentType())) {
+                BigDecimal changeAmount = paymentAmount.subtract(order.getTotalValue());
+                if (changeAmount.doubleValue() > 0.0) {
+                    payment = new Payment();
+                    payment.setReceipt(receipt);
+                    payment.setType(PaymentType.valueOf("CHANGE").getPaymentType());
+                    payment.setAmount(changeAmount);
+                    paymentPersist.add(payment);
+                }
+            }
+
             Ticket ticket = getPostedTicket(receipt);
-            
-            ticketLinePersist.addTicketLineList(getContext().getOrder(), ticket);
-            
-            sharedTicketPersist.delete(getContext().getOrder().getId());
+            ticketLinePersist.addTicketLineList(order, ticket);
+
+            sharedTicketPersist.delete(order.getId());
             getContext().setOrder(null);
         } catch (SQLException ex) {
             getContext().getValidationErrors().addGlobalError(
