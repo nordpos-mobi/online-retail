@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 import mobi.nordpos.dao.model.ClosedCash;
 import mobi.nordpos.dao.model.Payment;
 import mobi.nordpos.dao.model.Payment.PaymentType;
@@ -31,11 +32,18 @@ import mobi.nordpos.dao.model.User;
 import mobi.nordpos.dao.factory.ClosedCashPersist;
 import mobi.nordpos.dao.factory.PaymentPersist;
 import mobi.nordpos.dao.factory.ReceiptPersist;
+import mobi.nordpos.dao.factory.StockCurrentPersist;
+import mobi.nordpos.dao.factory.StockDiaryPersist;
 import mobi.nordpos.dao.factory.TaxLinePersist;
 import mobi.nordpos.dao.factory.TicketLinePersist;
 import mobi.nordpos.dao.factory.TicketNumberPersist;
 import mobi.nordpos.dao.factory.TicketPersist;
 import mobi.nordpos.dao.factory.UserPersist;
+import mobi.nordpos.dao.model.Location;
+import mobi.nordpos.dao.model.Product;
+import mobi.nordpos.dao.model.StockCurrent;
+import mobi.nordpos.dao.model.StockDiary.MovementReasonType;
+import mobi.nordpos.dao.model.TicketLine;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.validation.SimpleError;
@@ -51,6 +59,7 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
     private static final String PAYMENT_VIEW = "/WEB-INF/jsp/order_payment.jsp";
 
     private static final String DEFAULT_USER_ID = "3";
+    private static final String DEFAULT_LOCATION_ID = "0";
 
     @Validate(on = {"post"}, required = true, expression = "${(paymentType == 'cash' && paymentAmount >= total) || (paymentType == 'magcard' && paymentAmount == total) }")
     private BigDecimal paymentAmount;
@@ -64,14 +73,13 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
     }
 
     public Resolution post() {
-        TicketLinePersist ticketLinePersist = new TicketLinePersist();
+
         TaxLinePersist taxLinePersist = new TaxLinePersist();
         PaymentPersist paymentPersist = new PaymentPersist();
         SharedTicket order = getContext().getOrder();
 
         try {
             sharedTicketPersist.init(getDataBaseConnection());
-            ticketLinePersist.init(getDataBaseConnection());
             taxLinePersist.init(getDataBaseConnection());
             paymentPersist.init(getDataBaseConnection());
 
@@ -84,19 +92,18 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
             payment.setAmount(paymentAmount);
             paymentPersist.add(payment);
 
-            if (paymentType.equals(PaymentType.valueOf("CASH").getPaymentType())) {
+            if (paymentType.equals(PaymentType.valueOf("CASH").getKey())) {
                 BigDecimal changeAmount = paymentAmount.subtract(order.getTotalValue());
                 if (changeAmount.doubleValue() > 0.0) {
                     payment = new Payment();
                     payment.setReceipt(receipt);
-                    payment.setType(PaymentType.valueOf("CHANGE").getPaymentType());
+                    payment.setType(PaymentType.valueOf("CHANGE").getKey());
                     payment.setAmount(changeAmount);
                     paymentPersist.add(payment);
                 }
             }
 
-            Ticket ticket = getPostedTicket(receipt);
-            ticketLinePersist.addTicketLineList(order, ticket);
+            Ticket ticket = getPostedTicket(order, receipt);
 
             sharedTicketPersist.delete(order.getId());
             getContext().setOrder(null);
@@ -117,12 +124,18 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
         return receiptPersist.add(receipt);
     }
 
-    private Ticket getPostedTicket(Receipt receipt) throws SQLException {
+    private Ticket getPostedTicket(SharedTicket order, Receipt receipt) throws SQLException {
         TicketPersist ticketPersist = new TicketPersist();
+        TicketLinePersist ticketLinePersist = new TicketLinePersist();
+        StockDiaryPersist stockDiaryPersist = new StockDiaryPersist();
+
         ticketPersist.init(getDataBaseConnection());
+        ticketLinePersist.init(getDataBaseConnection());
+        stockDiaryPersist.init(getDataBaseConnection());
+
         Ticket ticket = new Ticket();
         ticket.setId(receipt.getId());
-        ticket.setType(TicketType.SELL.getTicketType());
+        ticket.setType(TicketType.SELL.getCode());
         ticket.setCustomer(getContext().getCustomer());
         ticket.setUser(getAssignUser(DEFAULT_USER_ID));
 
@@ -131,7 +144,36 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
             ticket.setNumber(number.getId());
         }
 
-        return ticketPersist.add(ticket);
+        ticket = ticketPersist.add(ticket);
+        ticketLinePersist.addTicketLineList(order, ticket);   
+        
+        ticket = ticketPersist.read(ticket.getId());        
+        Location location = new Location();
+        location.setId(DEFAULT_LOCATION_ID);
+        List<TicketLine> ticketLineList = ticketPersist.readTicketLineList(ticket);
+        stockDiaryPersist.addStockDiaryList(MovementReasonType.OUT_SALE.getValue(), location, receipt, ticketLineList);
+        updateStockCurrentSale(location, ticketLineList);
+
+        return ticket;
+    }
+
+    private void updateStockCurrentSale(Location location, List<TicketLine> ticketLineList) throws SQLException {
+        StockCurrentPersist stockCurrentPersist = new StockCurrentPersist();
+        stockCurrentPersist.init(getDataBaseConnection());
+        for (TicketLine line : ticketLineList) {
+            Product product = line.getProduct();
+            StockCurrent stock = stockCurrentPersist.read(location, product);
+            if (stock == null) {
+                stock = new StockCurrent();
+                stock.setLocation(location);
+                stock.setProduct(product);
+                stock.setUnit(line.getUnit().negate());
+                stockCurrentPersist.add(stock);
+            } else {
+                stock.setUnit(stock.getUnit().subtract(line.getUnit()));
+                stockCurrentPersist.change(stock);
+            }
+        }
     }
 
     private User getAssignUser(String id) throws SQLException {
