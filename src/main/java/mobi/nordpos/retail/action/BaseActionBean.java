@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import mobi.nordpos.dao.model.Application;
-import mobi.nordpos.dao.ormlite.ApplicationPersist;
+import mobi.nordpos.dao.factory.ApplicationPersist;
 import mobi.nordpos.retail.ext.MobileActionBeanContext;
 import mobi.nordpos.retail.ext.MyLocalePicker;
 import net.sourceforge.stripes.action.ActionBean;

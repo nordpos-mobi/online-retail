@@ -28,14 +28,14 @@ import mobi.nordpos.dao.model.Ticket;
 import mobi.nordpos.dao.model.Ticket.TicketType;
 import mobi.nordpos.dao.model.TicketNumber;
 import mobi.nordpos.dao.model.User;
-import mobi.nordpos.dao.ormlite.ClosedCashPersist;
-import mobi.nordpos.dao.ormlite.PaymentPersist;
-import mobi.nordpos.dao.ormlite.ReceiptPersist;
-import mobi.nordpos.dao.ormlite.TaxLinePersist;
-import mobi.nordpos.dao.ormlite.TicketLinePersist;
-import mobi.nordpos.dao.ormlite.TicketNumberPersist;
-import mobi.nordpos.dao.ormlite.TicketPersist;
-import mobi.nordpos.dao.ormlite.UserPersist;
+import mobi.nordpos.dao.factory.ClosedCashPersist;
+import mobi.nordpos.dao.factory.PaymentPersist;
+import mobi.nordpos.dao.factory.ReceiptPersist;
+import mobi.nordpos.dao.factory.TaxLinePersist;
+import mobi.nordpos.dao.factory.TicketLinePersist;
+import mobi.nordpos.dao.factory.TicketNumberPersist;
+import mobi.nordpos.dao.factory.TicketPersist;
+import mobi.nordpos.dao.factory.UserPersist;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.validation.SimpleError;
@@ -200,82 +200,4 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
 
     }
 
-//    public Ticket saveTicket(OpenTicket openTicket) throws SQLException {
-//        try {
-//            connection = new JdbcConnectionSource(getDataBaseURL(), getDataBaseUser(), getDataBasePassword());
-//            ReceiptDAO receiptDao = new ReceiptPersist(connection);
-//            TicketDAO ticketDao = new TicketPersist(connection);
-//            TicketNumberDAO ticketNumberDao = new TicketNumberPersist(connection);
-//
-//            if (!openTicket.getTicketLineList().isEmpty()) {
-//                Receipt receipt = receiptDao.createNew(getOpenCash());
-//                Ticket ticket = ticketDao.createNew(new Ticket(
-//                        receipt.getId(),
-//                        TicketType.SELL.getTicketType(),
-//                        ticketNumberDao.generate(),
-//                        receipt,
-//                        openTicket.getUser(),
-//                        openTicket.getFiscalNumber()));
-//                ticket.setTicketLineCollection(openTicket.getTicketLineList());
-//
-//                ForeignCollection<TicketLine> ticketLineCollection = ticket.getTicketLineCollection();
-//                CloseableIterator<TicketLine> ticketLineIterator = ticketLineCollection.closeableIterator();
-//
-//                ForeignCollection<TaxLine> taxLineCollection = receipt.getTaxLineCollection();
-//
-//                try {
-//                    while (ticketLineIterator.hasNext()) {
-//                        TicketLine line = ticketLineIterator.next();
-//                        Tax selectTax = line.getTax();
-//                        CloseableIterator<TaxLine> taxLineIterator = taxLineCollection.closeableIterator();
-//                        TaxLine newTaxLine = new TaxLine(
-//                                receipt,
-//                                selectTax,
-//                                line.getSubTotal().doubleValue(),
-//                                line.getTaxAmountSubTotal().doubleValue());
-//
-//                        boolean f = true;
-//                        try {
-//                            while (taxLineIterator.hasNext()) {
-//                                TaxLine taxLine = taxLineIterator.next();
-//                                if (taxLine.getTax().getId().equals(selectTax.getId())) {
-//                                    taxLine.setBase(taxLine.getBase() + line.getSubTotal().doubleValue());
-//                                    taxLine.setAmount(taxLine.getAmount() + line.getTaxAmountSubTotal().doubleValue());
-//                                    taxLineCollection.update(taxLine);
-//                                    f = false;
-//                                    break;
-//                                }
-//                            }
-//                        } finally {
-//                            taxLineIterator.close();
-//                        }
-//
-//                        if (f) {
-//                            taxLineCollection.add(newTaxLine);
-//                        }
-//                    }
-//                } finally {
-//                    ticketLineIterator.close();
-//                }
-//
-//                ForeignCollection<Payment> paymentCollection = receipt.getPaymentCollection();
-//                BigDecimal total = openTicket.getTaxTotal();
-//                paymentCollection.add(new Payment(receipt, paymentType, payAmount));
-//                if (paymentType.equals(PaymentType.valueOf("CASH").getPaymentType()) && payAmount > total.doubleValue()) {
-//                    paymentCollection.add(new Payment(receipt, PaymentType.valueOf("CHANGE").getPaymentType(), BigDecimal.valueOf(payAmount).subtract(total).doubleValue()));
-//                }
-//
-//                getContext().setOpenTicket(new OpenTicket(getContext().getUser()));
-//
-//                return ticket;
-//
-//            } else {
-//                throw new UnsupportedOperationException("Not supported yet.");
-//            }
-//        } finally {
-//            if (connection != null) {
-//                connection.close();
-//            }
-//        }
-//    }
 }

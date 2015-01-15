@@ -16,7 +16,7 @@
 package mobi.nordpos.retail.action;
 
 import mobi.nordpos.dao.model.ProductCategory;
-import mobi.nordpos.dao.ormlite.ProductCategoryPersist;
+import mobi.nordpos.dao.factory.ProductCategoryPersist;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>

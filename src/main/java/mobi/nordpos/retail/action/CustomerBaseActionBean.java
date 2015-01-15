@@ -16,7 +16,7 @@
 package mobi.nordpos.retail.action;
 
 import mobi.nordpos.dao.model.Customer;
-import mobi.nordpos.dao.ormlite.CustomerPersist;
+import mobi.nordpos.dao.factory.CustomerPersist;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>

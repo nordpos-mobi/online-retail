@@ -20,7 +20,7 @@ import java.util.List;
 import mobi.nordpos.retail.ext.Public;
 import mobi.nordpos.dao.model.Product;
 import mobi.nordpos.dao.model.ProductCategory;
-import mobi.nordpos.dao.ormlite.TaxPersist;
+import mobi.nordpos.dao.factory.TaxPersist;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;

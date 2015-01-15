@@ -16,8 +16,8 @@
 package mobi.nordpos.retail.action;
 
 import mobi.nordpos.dao.model.Product;
-import mobi.nordpos.dao.ormlite.ProductPersist;
-import mobi.nordpos.dao.ormlite.SharedTicketPersist;
+import mobi.nordpos.dao.factory.ProductPersist;
+import mobi.nordpos.dao.factory.SharedTicketPersist;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
