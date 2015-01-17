@@ -17,7 +17,7 @@
     </stripes:layout-component>
 
     <stripes:layout-component name="title">
-        <stripes:label name="label.PaymentSelect"/>
+        <fmt:message key="label.PaymentSelect"/>
     </stripes:layout-component>
 
     <stripes:layout-component name="content">

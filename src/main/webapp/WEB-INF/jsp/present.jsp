@@ -32,7 +32,7 @@
             <sdynattr:link href="/CategoryList.action"
                            class="ui-btn ui-shadow ui-corner-all"
                            role="button">
-                <fmt:message key="label.Catalog" />
+                <fmt:message key="label.Shop" />
             </sdynattr:link>   
         </div>
     </stripes:layout-component>
