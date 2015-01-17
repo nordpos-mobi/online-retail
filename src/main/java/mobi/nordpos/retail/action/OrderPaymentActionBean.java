@@ -46,6 +46,7 @@ import mobi.nordpos.dao.model.StockDiary.MovementReasonType;
 import mobi.nordpos.dao.model.TicketLine;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.SimpleMessage;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.Validate;
 import net.sourceforge.stripes.validation.ValidationErrors;
@@ -57,9 +58,6 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 public class OrderPaymentActionBean extends OrderBaseActionBean {
 
     private static final String PAYMENT_VIEW = "/WEB-INF/jsp/order_payment.jsp";
-
-    private static final String DEFAULT_USER_ID = "3";
-    private static final String DEFAULT_LOCATION_ID = "0";
 
     @Validate(on = {"post"}, required = true, expression = "${(paymentType == 'cash' && paymentAmount >= total) || (paymentType == 'magcard' && paymentAmount == total) }")
     private BigDecimal paymentAmount;
@@ -86,6 +84,8 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
             Receipt receipt = getPostedReceipt();
             taxLinePersist.addTaxLineList(order, receipt);
 
+            Ticket ticket = getPostedTicket(order, receipt);
+
             Payment payment = new Payment();
             payment.setReceipt(receipt);
             payment.setType(paymentType);
@@ -100,13 +100,23 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
                     payment.setType(PaymentType.valueOf("CHANGE").getKey());
                     payment.setAmount(changeAmount);
                     paymentPersist.add(payment);
+                    getContext().getMessages().add(
+                            new SimpleMessage(getLocalizationKey("message.Ticket.paid.cash"), order.getTotalValue().toString(), ticket.getNumber(), changeAmount.toString())
+                    );
+                } else {
+                    getContext().getMessages().add(
+                            new SimpleMessage(getLocalizationKey("message.Ticket.paid.other"), order.getTotalValue().toString(), ticket.getNumber().toString())
+                    );
                 }
             }
 
-            Ticket ticket = getPostedTicket(order, receipt);
+            getContext().getMessages().add(
+                    new SimpleMessage(getLocalizationKey("message.Thanks"))
+            );
 
             sharedTicketPersist.delete(order.getId());
             getContext().setOrder(null);
+
         } catch (SQLException ex) {
             getContext().getValidationErrors().addGlobalError(
                     new SimpleError(ex.getMessage()));
@@ -137,7 +147,8 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
         ticket.setId(receipt.getId());
         ticket.setType(TicketType.SELL.getCode());
         ticket.setCustomer(getContext().getCustomer());
-        ticket.setUser(getAssignUser(DEFAULT_USER_ID));
+        User user = getUser();
+        ticket.setUser(user);
 
         TicketNumber number = getCurrentTicketNumber();
         if (number != null) {
@@ -145,11 +156,10 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
         }
 
         ticket = ticketPersist.add(ticket);
-        ticketLinePersist.addTicketLineList(order, ticket);   
-        
-        ticket = ticketPersist.read(ticket.getId());        
-        Location location = new Location();
-        location.setId(DEFAULT_LOCATION_ID);
+        ticketLinePersist.addTicketLineList(order, ticket);
+
+        ticket = ticketPersist.read(ticket.getId());
+        Location location = getLocation();
         List<TicketLine> ticketLineList = ticketPersist.readTicketLineList(ticket);
         stockDiaryPersist.addStockDiaryList(MovementReasonType.OUT_SALE.getValue(), location, receipt, ticketLineList);
         updateStockCurrentSale(location, ticketLineList);
@@ -174,12 +184,6 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
                 stockCurrentPersist.change(stock);
             }
         }
-    }
-
-    private User getAssignUser(String id) throws SQLException {
-        UserPersist userPersist = new UserPersist();
-        userPersist.init(getDataBaseConnection());
-        return userPersist.find(User.ID, id);
     }
 
     private TicketNumber getCurrentTicketNumber() throws SQLException {
@@ -223,7 +227,7 @@ public class OrderPaymentActionBean extends OrderBaseActionBean {
 
     @ValidationMethod(on = "post")
     public void validateClosedCashIsOpen(ValidationErrors errors) throws UnknownHostException {
-        String hostName = java.net.InetAddress.getLocalHost().getHostName();
+        String hostName = getHostName();
         ClosedCashPersist closedCashPersist = new ClosedCashPersist();
         try {
             closedCashPersist.init(getDataBaseConnection());

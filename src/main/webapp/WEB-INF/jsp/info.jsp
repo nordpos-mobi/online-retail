@@ -88,7 +88,7 @@
                 </div>
                 <div class="ui-block-b">
                     <div class="ui-body ui-body-c">
-                        <c:out value="${actionBean.webApplicationVersion.toString()}" />
+                        <c:out value="${actionBean.webApplicationVersion}" />
                     </div>
                 </div>
                 <div class="ui-block-a">
@@ -99,6 +99,36 @@
                 <div class="ui-block-b">
                     <div class="ui-body ui-body-c">
                         <c:out value="${actionBean.application.toString()}" />
+                    </div>
+                </div>
+                <div class="ui-block-a">
+                    <div class="ui-body ui-body-c">
+                        <fmt:message key="label.pos.host.name" />
+                    </div>
+                </div>
+                <div class="ui-block-b">
+                    <div class="ui-body ui-body-c">
+                        <c:out value="${actionBean.hostName}" />
+                    </div>
+                </div>
+                <div class="ui-block-a">
+                    <div class="ui-body ui-body-c">
+                        <fmt:message key="label.pos.user.name" />
+                    </div>
+                </div>
+                <div class="ui-block-b">
+                    <div class="ui-body ui-body-c">
+                        <c:out value="${actionBean.user.name}" />
+                    </div>
+                </div>
+                <div class="ui-block-a">
+                    <div class="ui-body ui-body-c">
+                        <fmt:message key="label.pos.location.name" />
+                    </div>
+                </div>
+                <div class="ui-block-b">
+                    <div class="ui-body ui-body-c">
+                        <c:out value="${actionBean.location.name}" />
                     </div>
                 </div>
             </div>
