@@ -26,14 +26,14 @@
                 <li class="ui-field-contain">
                     <stripes:label name="label.payment.amount" for="payAmount" />
                     <input type="text"
-                           name="paymentAmount" id="payAmount"
-                           value="${actionBean.total}" 
+                           name="payment.amount" id="payAmount"
+                           value="${order.totalValue}" 
                            data-clear-btn="true"
                            placeholder="<fmt:message key="label.PayAmount.enter" />"/>
                 </li>
                 <li class="ui-field-contain">
                     <stripes:label name="label.payment.type" for="paymentType" />
-                    <sdynattr:select name="paymentType" id="paymentType">
+                    <sdynattr:select name="payment.type" id="paymentType">
                         <stripes:option value="cash">
                             <fmt:message key="label.payment.cash" />
                         </stripes:option>

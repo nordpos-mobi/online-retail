@@ -58,6 +58,11 @@
             <version>1.1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>net.authorize</groupId>
+            <artifactId>anet-java-sdk</artifactId>
+            <version>1.8.3</version>
+        </dependency>
+        <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>6.0</version>
@@ -66,7 +71,7 @@
     </dependencies>
 
     <build>
-        <finalName>online-service</finalName>
+        <finalName>online-retail</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
