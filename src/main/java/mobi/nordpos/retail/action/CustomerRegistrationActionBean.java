@@ -50,8 +50,8 @@ public class CustomerRegistrationActionBean extends CustomerBaseActionBean {
         return new ForwardResolution(REG_FORM);
     }
 
-    public Resolution accept() throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        try {
+    public Resolution accept() throws UnsupportedEncodingException, NoSuchAlgorithmException, SQLException {
+//        try {
             customerPersist.init(getDataBaseConnection());
             Customer customer = getCustomer();
             customer.setSearchkey(customer.getName());
@@ -59,11 +59,11 @@ public class CustomerRegistrationActionBean extends CustomerBaseActionBean {
                     new SimpleMessage(getLocalizationKey("message.Customer.registered"),
                             customerPersist.add(customer).getName())
             );
-        } catch (SQLException ex) {
-            getContext().getValidationErrors().addGlobalError(
-                    new SimpleError(ex.getMessage()));
-            return getContext().getSourcePageResolution();
-        }
+//        } catch (SQLException ex) {
+//            getContext().getValidationErrors().addGlobalError(
+//                    new SimpleError(ex.getMessage()));
+//            return getContext().getSourcePageResolution();
+//        }
         return new ForwardResolution(CustomerAuthorizationActionBean.class);
     }
 

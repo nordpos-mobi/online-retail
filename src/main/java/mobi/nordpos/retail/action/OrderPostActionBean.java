@@ -85,6 +85,7 @@ public class OrderPostActionBean extends OrderBaseActionBean {
         PaymentPersist paymentPersist = new PaymentPersist();
         SharedTicket order = getContext().getOrder();
 
+        Ticket ticket;
         Payment payment = getPayment();
 
         if (payment.getType().equals(PaymentType.valueOf("CARD").getKey())) {
@@ -111,7 +112,7 @@ public class OrderPostActionBean extends OrderBaseActionBean {
             Receipt receipt = getPostedReceipt();
             taxLinePersist.addTaxLineList(order, receipt);
 
-            Ticket ticket = getPostedTicket(order, receipt);
+            ticket = getPostedTicket(order, receipt);
 
             payment.setReceipt(receipt);
             paymentPersist.add(payment);
@@ -141,7 +142,7 @@ public class OrderPostActionBean extends OrderBaseActionBean {
                     new SimpleError(ex.getMessage()));
             return getContext().getSourcePageResolution();
         }
-        return new ForwardResolution(WelcomeActionBean.class);
+        return new ForwardResolution(TicketViewActionBean.class).addParameter("ticket.id", ticket.getId());
     }
 
     private Receipt getPostedReceipt() throws SQLException {
@@ -163,7 +164,7 @@ public class OrderPostActionBean extends OrderBaseActionBean {
         stockDiaryPersist.init(getDataBaseConnection());
 
         Ticket ticket = new Ticket();
-        ticket.setId(receipt.getId());
+        ticket.setId(receipt.getId().toString());
         ticket.setType(TicketType.SELL.getCode());
         ticket.setCustomer(getContext().getCustomer());
         User user = getUser();
