@@ -35,54 +35,6 @@
                                         type="BOTH"/>
                     </div>
                 </div>
-            </div>
-            <div class="ui-grid-a ui-responsive">
-                <div class="ui-block-a">
-                    <div class="ui-body ui-body-c">
-                        <fmt:message key="label.Ticket.subValue" />
-                    </div>
-                </div>
-                <div class="ui-block-b">
-                    <div class="ui-body ui-body-c">
-                        <fmt:formatNumber value="${actionBean.ticket.subValue}"
-                                          type="CURRENCY"
-                                          pattern="#0.00 ¤"                                                  
-                                          maxFractionDigits="2" 
-                                          minFractionDigits="2"/>
-                    </div>
-                </div>
-            </div>
-            <div class="ui-grid-a ui-responsive">
-                <div class="ui-block-a">
-                    <div class="ui-body ui-body-c">
-                        <fmt:message key="label.Ticket.taxAmount" />
-                    </div>
-                </div>
-                <div class="ui-block-b">
-                    <div class="ui-body ui-body-c">
-                        <fmt:formatNumber value="${actionBean.ticket.taxAmount}"
-                                          type="CURRENCY"
-                                          pattern="#0.00 ¤"                                                  
-                                          maxFractionDigits="2" 
-                                          minFractionDigits="2"/>
-                    </div>
-                </div>
-            </div>
-            <div class="ui-grid-a ui-responsive">
-                <div class="ui-block-a">
-                    <div class="ui-body ui-body-c">
-                        <fmt:message key="label.Ticket.totalValue" />
-                    </div>
-                </div>
-                <div class="ui-block-b">
-                    <div class="ui-body ui-body-c">
-                        <fmt:formatNumber value="${actionBean.ticket.totalValue}"
-                                          type="CURRENCY"
-                                          pattern="#0.00 ¤"                                                  
-                                          maxFractionDigits="2" 
-                                          minFractionDigits="2"/>
-                    </div>
-                </div>
             </div>            
         </div>
 
@@ -96,10 +48,13 @@
                cellspacing="0" cellpadding="0">
             <thead>
                 <tr class="ui-bar-b">
-                    <th data-priority="persist" style="width: 10%"><fmt:message key="label.line.number" /></th>
-                    <th data-priority="persist" style="width: 50%"><fmt:message key="label.line.name" /></th>                    
+                    <th data-priority="persist" style="width: 5%"><fmt:message key="label.line.number" /></th>
+                    <th data-priority="persist" style="width: 35%"><fmt:message key="label.line.name" /></th>
+                    <th data-priority="persist" style="width: 10%"><fmt:message key="label.line.price" /></th>
                     <th data-priority="persist" style="width: 10%"><fmt:message key="label.line.unit" /></th>
-                    <th data-priority="3" style="width: 15%"><fmt:message key="label.line.value" /></th>
+                    <th data-priority="2" style="width: 15%"><fmt:message key="label.line.subvalue" /></th>
+                    <th data-priority="1" style="width: 10%"><fmt:message key="label.line.tax" /></th>
+                    <th data-priority="persist" style="width: 15%"><fmt:message key="label.line.value" /></th>
                 </tr>
             </thead>
             <tbody>
@@ -107,10 +62,25 @@
                     <tr>
                         <th style="text-align: center;"><c:out value="${line.number + 1}" /></th>
                         <td><c:out value="${line.product.name}" /></td>
+                        <td style="text-align: right;"><fmt:formatNumber value="${line.taxPrice}"
+                                          type="CURRENCY"
+                                          pattern="#0.00 ¤"                                                  
+                                          maxFractionDigits="2" 
+                                          minFractionDigits="2"/></td>
                         <td style="text-align: center;"><fmt:formatNumber value="${line.unit}"
                                           type="NUMBER"                                   
                                           maxFractionDigits="3"/></td>
-                        <td style="text-align: right;"><fmt:formatNumber value="${line.taxPrice}"
+                        <td style="text-align: right;"><fmt:formatNumber value="${line.subTotalValue}"
+                                          type="CURRENCY"
+                                          pattern="#0.00 ¤"                                                  
+                                          maxFractionDigits="2" 
+                                          minFractionDigits="2"/></td>
+                        <td style="text-align: right;"><fmt:formatNumber value="${line.totalTaxAmount}"
+                                          type="CURRENCY"
+                                          pattern="#0.00 ¤"                                                  
+                                          maxFractionDigits="2" 
+                                          minFractionDigits="2"/></td>
+                        <td style="text-align: right;"><fmt:formatNumber value="${line.totalValue}"
                                           type="CURRENCY"
                                           pattern="#0.00 ¤"                                                  
                                           maxFractionDigits="2" 
@@ -118,6 +88,29 @@
                     </tr>
                 </c:forEach>
             </tbody>
+            <tfoot>
+                <tr class="ui-bar-a">
+                    <th colspan="3"><fmt:message key="label.line.total" /></th>
+                    <td style="text-align: center;"><fmt:formatNumber value="${actionBean.ticket.totalUnit}"
+                                      type="NUMBER"                                   
+                                      maxFractionDigits="3"/></td>
+                    <td style="text-align: right;"><fmt:formatNumber value="${actionBean.ticket.subTotalValue}"
+                                      type="CURRENCY"
+                                      pattern="#0.00 ¤"                                                  
+                                      maxFractionDigits="2" 
+                                      minFractionDigits="2"/></td>
+                    <td style="text-align: right;"><fmt:formatNumber value="${actionBean.ticket.totalTaxAmount}"
+                                      type="CURRENCY"
+                                      pattern="#0.00 ¤"                                                  
+                                      maxFractionDigits="2" 
+                                      minFractionDigits="2"/></td>
+                    <td style="text-align: right;"><fmt:formatNumber value="${actionBean.ticket.totalValue}"
+                                      type="CURRENCY"
+                                      pattern="#0.00 ¤"                                                  
+                                      maxFractionDigits="2" 
+                                      minFractionDigits="2"/></td>
+                </tr>
+            </tfoot>
         </table>
 
     </stripes:layout-component>

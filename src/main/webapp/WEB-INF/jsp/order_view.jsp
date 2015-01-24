@@ -131,9 +131,7 @@
                                         </div>
                                     </fieldset>
                                 </div>
-                            </div>        
-
-
+                            </div>
                         </td>
                     </tr>
                 </c:forEach>
