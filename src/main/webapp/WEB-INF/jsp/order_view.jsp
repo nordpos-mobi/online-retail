@@ -158,7 +158,8 @@
         <div class="ui-body">
             <sdynattr:link href="/OrderPayment.action"
                            event="view"
-                           class="ui-btn ui-shadow ui-corner-all"
+                           data-transition="slide"
+                           class="ui-btn ui-shadow ui-corner-all"                           
                            role="button">
                 <fmt:message key="label.OrderPayment" />
             </sdynattr:link>  

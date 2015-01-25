@@ -21,7 +21,8 @@
     </stripes:layout-component>
 
     <stripes:layout-component name="content">
-        <stripes:form action="/OrderPayment.action">
+        <sdynattr:form action="/OrderPayment.action"
+                       data-transition="slide">
             <ul data-role="listview" data-inset="true">
                 <li class="ui-field-contain">
                     <stripes:label name="label.payment.amount" for="payAmount" />
@@ -53,7 +54,7 @@
                     </fieldset>
                 </li>
             </ul>
-        </stripes:form>
+        </sdynattr:form>
 
     </stripes:layout-component>
 

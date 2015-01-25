@@ -25,7 +25,12 @@
     </stripes:layout-component>
 
     <stripes:layout-component name="content">
-        <stripes:form action="/OrderPost.action">
+        <div class="ui-body ui-body-a ui-corner-all" style="color: red">
+            <h3><fmt:message key="label.Attention" /></h3>
+            <p><fmt:message key="label.Attention.AuthorizeNetSandbox.notes" /></p>
+        </div>
+        <sdynattr:form action="/OrderPost.action"
+                       data-transition="slide">
             <div>                
                 <stripes:hidden name="payment.type" value="${actionBean.payment.type}"/>
                 <stripes:hidden name="payment.amount" value="${actionBean.payment.amount}"/>
@@ -60,7 +65,7 @@
                     </fieldset>
                 </li>
             </ul>        
-        </stripes:form>
+        </sdynattr:form>
     </stripes:layout-component>
 
     <stripes:layout-component name="footer">
