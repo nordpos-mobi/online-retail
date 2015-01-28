@@ -115,7 +115,6 @@ public class OrderPostActionBean extends OrderBaseActionBean {
             ticket = getPostedTicket(order, receipt);
 
             payment.setReceipt(receipt);
-            paymentPersist.add(payment);
 
             if (payment.getType().equals(PaymentType.valueOf("CASH").getKey())) {
                 BigDecimal changeAmount = payment.getAmount().subtract(order.getTotalValue());
@@ -133,6 +132,9 @@ public class OrderPostActionBean extends OrderBaseActionBean {
                         new SimpleMessage(getLocalizationKey("message.Thanks"))
                 );
             }
+
+            payment.setAmount(order.getTotalValue());
+            paymentPersist.add(payment);
 
             sharedTicketPersist.delete(order.getId());
             getContext().setOrder(null);
@@ -211,7 +213,7 @@ public class OrderPostActionBean extends OrderBaseActionBean {
         ticketNumberPersist.init(getDataBaseConnection());
         TicketNumber number = ticketNumberPersist.readList().get(0);
         if (getDataBaseConnection().getDatabaseType().getDatabaseName().equals("Derby Client/Server")) {
-            if (ticketNumberPersist.delete(number)) {
+            if (ticketNumberPersist.delete(number.getId())) {
                 return ticketNumberPersist.add(new TicketNumber());
             } else {
                 return null;
