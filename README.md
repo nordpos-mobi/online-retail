@@ -24,9 +24,9 @@ https://sourceforge.net/projects/nordpos/files/online-retail/
 https://sourceforge.net/p/nordpos/discussion/online-retail/
 
 ## System requirements
-Java virtual machine: Java Oracle Corporation 1.7(**tested**)
+Java virtual machine: Java Oracle Corporation 1.7(**tested**), Java Oracle Corporation 1.8(**tested**) 
 
-Java servlet container: Apache Tomcat 8.0.3(**tested**) and Apache Tomcat 7.0.55(**tested**)
+Java servlet container: Apache Tomcat 8.0.3(**tested**), Apache Tomcat 7.0.55(**tested**), Jetty 9.2.5(**tested**)
 
 ## Included by
 [Stripes](http://stripesframework.org) is a simply MVC framework.
