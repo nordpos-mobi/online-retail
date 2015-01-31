@@ -6,6 +6,8 @@ Project: http://nordpos.mobi
 * [1.0.0](https://github.com/nordpos-mobi/online-retail/releases/tag/1.0.0):
   * select products and categories from desktop POS on online shopping catalogue;
   * design a mobile UI for web cart;
+  * business logic for accept payment and post ticket; 
+  * card payment processing based on Java SDK for [Authorize.Net API](https://github.com/AuthorizeNet/sdk-java);
   * create authorization form for registration new customers;
   * select, change and delete the lines by customer order;
   * realize security by Public and nonPublic ActionBean and authentication by the customer password;
@@ -33,7 +35,7 @@ Java servlet container: Apache Tomcat 8.0.3(**tested**) and Apache Tomcat 7.0.55
 
 [jQuery Mobile](http://jquerymobile.com/) is a mobile interface library.
 
-[Flot](http://www.flotcharts.org/) is a pure JavaScript plotting library for jQuery.
+[Authorize.Net Java SDK](http://developer.authorize.net/) is a fully functioning Authorize.Net payment gateway supporting the current API methods.
 
 [JavaEE 6](http://www.oracle.com/technetwork/java/javaee/tech/javaee6technologies-1955512.html) Web Specification APIs.
 
