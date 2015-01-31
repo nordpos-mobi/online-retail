@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class BaseActionBean implements ActionBean {
 
-    private static final String WEB_APP_VERSION = "1.0.0-SNAPSHOT";
+    private static final String WEB_APP_VERSION = "1.0.0";
 
     private static final String DEFAULT_USER_ID = "3";
     private static final String DEFAULT_LOCATION_ID = "0";
